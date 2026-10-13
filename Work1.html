@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>软件工程课程设计展示页面</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        body {
+            background-color: #f0f4f9;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 35px;
+            border-radius: 14px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom:24px;
+            font-size:28px;
+        }
+        .info-card{
+            background-color:#e8f0fc;
+            padding:18px;
+            border-radius:10px;
+            margin-bottom:30px;
+        }
+        h2{
+            color:#34495e;
+            margin:26px 0 12px;
+            font-size:21px;
+            border-left:4px solid #4080d0;
+            padding-left:10px;
+        }
+        p, li{
+            line-height:1.8;
+            color:#444;
+            font-size:16px;
+        }
+        ul{
+            padding-left:24px;
+            margin:8px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>软件工程课程设计</h1>
+        <div class="info-card">
+            <p><strong>项目名称：</strong>简易学生信息管理系统</p>
+            <p><strong>学生姓名：</strong>张承远</p>
+            <p><strong>学号：</strong>2024310143019</p>
+        </div>
+
+        <h2>一、项目简介</h2>
+        <p>本项目遵循软件工程完整开发生命周期，从需求调研、需求分析开始，完成概要设计、详细设计、前端原型实现以及系统测试工作。本页面作为课程设计的成果原型展示页面，用于向授课老师展示项目整体设计思路与功能原型。简易学生信息管理系统主要面向学校教务管理人员，实现学生基础信息的数字化管理，简化人工登记、查找学生信息的繁琐流程。</p>
+
+        <h2>二、需求分析</h2>
+        <ul>
+            <li>用户登录与身份验证：区分管理员用户，校验账号密码，未登录用户无法进入管理页面</li>
+            <li>学生信息录入：新增学生学号、姓名、专业、班级、联系电话等基础信息</li>
+            <li>信息查询功能：支持按照学号、姓名快速检索对应的学生信息</li>
+            <li>信息修改、删除：管理员可对已有学生数据进行更新或删除操作</li>
+            <li>信息列表展示：分页展示全部学生信息，界面简洁直观</li>
+        </ul>
+
+        <h2>三、开发技术</h2>
+        <ul>
+            <li>HTML：搭建页面基础结构，划分各个功能模块</li>
+            <li>CSS：页面美化、布局排版，适配电脑浏览器，保证页面美观</li>
+            <li>JavaScript：实现前端简单交互，表单校验、信息增删查改的前端模拟</li>
+        </ul>
+
+        <h2>四、系统设计</h2>
+        <p>系统整体分为两大模块：用户登录模块、学生信息管理模块。可绘制用例图描述用户操作场景；使用类图描述学生实体、管理员实体的属性与方法；使用时序图描述登录、查询信息的交互流程。</p>
+        <p>数据设计：学生实体包含学号、姓名、专业、班级、手机号、入学时间字段。</p>
+
+        <h2>五、系统测试</h2>
+        <p>采用黑盒测试方法，设计测试用例，对登录、新增、查询、修改、删除功能逐项测试，验证功能是否符合需求，记录bug并修复，保证系统原型稳定可用。</p>
+
+        <h2>六、总结</h2>
+        <p>通过本次软件工程课程设计，完整体验软件项目开发全流程，理解软件生命周期各个阶段的任务。掌握需求分析、UML建模、系统设计、前端原型开发与软件测试的基础方法，认识到规范开发流程对软件项目的重要性，为后续软件开发学习打下基础。</p>
+    </div>
+</body>
+</html>
