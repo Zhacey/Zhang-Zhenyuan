@@ -6,44 +6,89 @@
     <title>猜数字小游戏</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft Yahei",sans-serif;}
-        body{background-color:#f0f6ff;padding:30px;text-align:center;}
-        .container{max-width:650px;margin:0 auto;background:white;padding:35px;border-radius:16px;box-shadow:0 4px 12px #cce0f5;}
+        body{background-color:#f0f6ff;padding:30px;text-align:center;transition: background 0.3s, color 0.3s;}
+        body.dark{background:#1f2937;color:#eee;}
+        .container{max-width:700px;margin:0 auto;background:white;padding:35px;border-radius:16px;box-shadow:0 4px 12px #cce0f5;transition: background 0.3s;}
+        body.dark .container{background:#374151;box-shadow:0 4px 12px #111827;}
         h1{color:#2c5c97;margin-bottom:10px;font-size:26px;}
-        .info-panel{background:#eef6ff;padding:12px;border-radius:10px;margin-bottom:20px;}
-        .info-panel p{margin:5px 0;color:#333;}
-        .game-area{margin:20px 0;}
+        body.dark h1{color:#93c5fd;}
+
+        .info-panel{background:#eef6ff;padding:16px;border-radius:10px;margin-bottom:20px;text-align:left;}
+        body.dark .info-panel{background:#4b5563;}
+        .info-row{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;margin:6px 0;}
+
+        .progress-wrap{margin:10px 0;}
+        #progressBar{width:100%;height:14px;border-radius:7px;background:#ddd;overflow:hidden;}
+        #progress{height:100%;background:#2c5c97;width:100%;transition: 0.3s;}
+        body.dark #progressBar{background:#222;}
+
         #tip{font-size:18px;margin:20px 0;color:#333;font-weight:bold;min-height:26px;transition:0.3s;}
+        body.dark #tip{color:#fff;}
         .win{color:#27ae60;}
         .lose{color:#e74c3c;}
-        input{padding:10px;width:180px;font-size:16px;border:2px solid #94b8e8;border-radius:8px;outline:none;text-align:center;}
-        .btn-group{margin-top:25px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
-        button{padding:11px 16px;border:none;border-radius:8px;font-size:15px;cursor:pointer;transition:0.2s;}
+        input{padding:10px;width:200px;font-size:16px;border:2px solid #94b8e8;border-radius:8px;outline:none;text-align:center;background:#fff;}
+        body.dark input{background:#222;color:#fff;border-color:#60a5fa;}
+
+        .btn-group{margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+        button{padding:11px 14px;border:none;border-radius:8px;font-size:14px;cursor:pointer;transition:0.2s;}
         #submit{background:#2c5c97;color:white;}
         #reset{background:#e67e22;color:white;}
         #hint{background:#27ae60;color:white;}
         #countBtn{background:#9b59b6;color:white;}
         #clearLog{background:#888;color:white;}
+        #themeBtn{background:#444;color:#fff;}
         button:hover{opacity:0.85;transform:scale(1.03);}
+
         .record{margin-top:25px;text-align:left;background:#f7faff;padding:15px;border-radius:10px;}
+        body.dark .record{background:#4b5563;}
         .record h3{color:#2c5c97;margin-bottom:8px;}
-        #log{font-size:14px;color:#444;max-height:140px;overflow-y:auto;}
+        body.dark .record h3{color:#93c5fd;}
+        #log{font-size:14px;color:#444;max-height:160px;overflow-y:auto;}
+        body.dark #log{color:#e5e7eb;}
+
+        /*弹窗*/
+        .modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;}
+        .modal-box{background:#fff;padding:30px;border-radius:12px;max-width:400px;text-align:center;}
+        body.dark .modal-box{background:#374151;color:#fff;}
     </style>
 </head>
 <body>
 <div class="container">
     <h1>猜数字小游戏</h1>
+
     <div class="info-panel">
-        <p>当前难度：<span id="levelText">普通(1~100)</span>｜剩余次数：<span id="remainText">10</span></p>
-        <p>本局得分：<span id="scoreText">0</span>｜历史最高分：<span id="highScoreText">0</span></p>
+        <div class="info-row">
+            <span>📅 当前日期：<span id="nowDate"></span></span>
+            <span>⏰ 系统时间：<span id="nowTime"></span></span>
+        </div>
+        <div class="info-row">
+            <span>🎮 当前难度：<span id="levelText">普通(1~100)</span></span>
+            <span>🔢 剩余猜测次数：<span id="remainText">10</span></span>
+        </div>
+        <div class="info-row">
+            <span>⭐ 本局得分：<span id="scoreText">0</span></span>
+            <span>🏆 历史最高分：<span id="highScoreText">0</span></span>
+        </div>
+        <div class="info-row">
+            <span>⏱️ 本局游戏时长：<span id="gameTime">00:00</span></span>
+            <span>👁️ 页面访问次数：<span id="visitCount">0</span></span>
+        </div>
+        <div class="progress-wrap">
+            <span>剩余机会进度：</span>
+            <div id="progressBar">
+                <div id="progress"></div>
+            </div>
+        </div>
         <div class="btn-group">
             <button id="easy">简单(1~50)</button>
             <button id="normal">普通(1~100)</button>
             <button id="hard">困难(1~200)</button>
+            <button id="themeBtn">切换深色/浅色</button>
         </div>
     </div>
 
     <div class="game-area">
-        <p>在范围内猜测随机数字，请输入你的数字：</p>
+        <p>在指定数字范围猜测随机数字，请输入你的数字：</p>
         <input type="number" id="numInput" placeholder="输入数字">
         <div id="tip">选择难度，开始游戏！</div>
 
@@ -57,8 +102,17 @@
     </div>
 
     <div class="record">
-        <h3>猜测记录</h3>
+        <h3>猜测记录日志</h3>
         <div id="log"></div>
+    </div>
+</div>
+
+<!-- 弹窗 -->
+<div class="modal" id="modal">
+    <div class="modal-box">
+        <h2 id="modalTitle"></h2>
+        <p id="modalMsg" style="margin:15px 0;"></p>
+        <button id="modalClose">确定</button>
     </div>
 </div>
 
@@ -69,6 +123,9 @@
     let rangeMin = 1;
     let rangeMax = 100;
     let highScore = localStorage.getItem("guessHighScore") || 0;
+    let visitCount = localStorage.getItem("visitCount") || 0;
+    let gameTimer = null;
+    let gameSecond = 0;
 
     let logDom = document.getElementById("log");
     let tipDom = document.getElementById("tip");
@@ -77,13 +134,59 @@
     let remainText = document.getElementById("remainText");
     let scoreText = document.getElementById("scoreText");
     let highScoreText = document.getElementById("highScoreText");
+    let nowDateDom = document.getElementById("nowDate");
+    let nowTimeDom = document.getElementById("nowTime");
+    let gameTimeDom = document.getElementById("gameTime");
+    let visitCountDom = document.getElementById("visitCount");
+    let progressDom = document.getElementById("progress");
+    let modal = document.getElementById("modal");
+    let modalTitle = document.getElementById("modalTitle");
+    let modalMsg = document.getElementById("modalMsg");
+    let modalClose = document.getElementById("modalClose");
+
+    visitCount++;
+    localStorage.setItem("visitCount", visitCount);
+    visitCountDom.innerText = visitCount;
     highScoreText.innerText = highScore;
+
+    // 实时时钟
+    function updateClock(){
+        let now = new Date();
+        let dateStr = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2,'0')}-${now.getDate().toString().padStart(2,'0')}`;
+        let timeStr = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`;
+        nowDateDom.innerText = dateStr;
+        nowTimeDom.innerText = timeStr;
+    }
+    setInterval(updateClock,1000);
+    updateClock();
+
+    // 游戏计时
+    function startGameTimer(){
+        gameSecond = 0;
+        clearInterval(gameTimer);
+        gameTimer = setInterval(()=>{
+            gameSecond++;
+            let m = Math.floor(gameSecond / 60).toString().padStart(2,'0');
+            let s = (gameSecond % 60).toString().padStart(2,'0');
+            gameTimeDom.innerText = `${m}:${s}`;
+        },1000);
+    }
+    function stopGameTimer(){
+        clearInterval(gameTimer);
+    }
+
+    //进度条更新
+    function updateProgress(total, left){
+        let percent = (left / total) *100;
+        progressDom.style.width = `${percent}%`;
+    }
 
     function initGame(){
         answer = Math.floor(Math.random() * (rangeMax - rangeMin +1)) + rangeMin;
-        if(rangeMax ===50) remain = 8;
-        else if(rangeMax ===100) remain =10;
-        else remain =15;
+        let totalChance;
+        if(rangeMax ===50) {remain = 8; totalChance =8;}
+        else if(rangeMax ===100) {remain =10; totalChance=10;}
+        else {remain =15; totalChance=15;}
         count = 0;
         tipDom.innerText = "新游戏开始！请输入数字";
         tipDom.className = "";
@@ -91,6 +194,8 @@
         inputDom.value = "";
         remainText.innerText = remain;
         scoreText.innerText = 0;
+        updateProgress(totalChance, remain);
+        startGameTimer();
     }
 
     //难度切换
@@ -120,8 +225,11 @@
         count++;
         remain--;
         remainText.innerText = remain;
+        let totalChance = rangeMax===50 ?8 : (rangeMax===100 ?10:15);
+        updateProgress(totalChance, remain);
         let msg = "";
         if(val === answer){
+            stopGameTimer();
             let score = remain * 10;
             scoreText.innerText = score;
             msg = `🎉恭喜！猜对啦！答案就是${val}，得分${score}`;
@@ -133,6 +241,10 @@
                 highScoreText.innerText = highScore;
             }
             logDom.innerHTML += `第${count}次：${val} → ${msg}<br/>`;
+            //弹窗
+            modalTitle.innerText = "🎉猜对了！";
+            modalMsg.innerText = `答案：${answer}\n本局得分：${score}\n用时：${gameTimeDom.innerText}`;
+            modal.style.display="flex";
             return;
         }else if(val < answer){
             msg = `❌数字偏小，再试试！`;
@@ -143,8 +255,12 @@
         logDom.innerHTML += `第${count}次：${val} → ${msg}<br/>`;
 
         if(remain <=0){
+            stopGameTimer();
             tipDom.innerText = `💥机会用完！游戏结束，答案是${answer}`;
             tipDom.className = "lose";
+            modalTitle.innerText = "💥游戏结束";
+            modalMsg.innerText = `次数耗尽！正确答案：${answer}`;
+            modal.style.display="flex";
         }
     }
 
@@ -162,6 +278,16 @@
     document.getElementById("clearLog").onclick = function(){
         logDom.innerHTML = "";
     }
+
+    //深色浅色切换
+    document.getElementById("themeBtn").onclick = function(){
+        document.body.classList.toggle("dark");
+    }
+    //关闭弹窗
+    modalClose.onclick = function(){
+        modal.style.display="none";
+    }
+    initGame();
 </script>
 </body>
 </html>
