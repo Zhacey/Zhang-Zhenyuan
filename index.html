@@ -7,17 +7,22 @@
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft Yahei",sans-serif;}
         body{background-color:#f0f6ff;padding:30px;text-align:center;}
-        .container{max-width:600px;margin:0 auto;background:white;padding:35px;border-radius:16px;box-shadow:0 4px 12px #cce0f5;}
-        h1{color:#2c5c97;margin-bottom:10px;font-size:24px;}
+        .container{max-width:650px;margin:0 auto;background:white;padding:35px;border-radius:16px;box-shadow:0 4px 12px #cce0f5;}
+        h1{color:#2c5c97;margin-bottom:10px;font-size:26px;}
+        .info-panel{background:#eef6ff;padding:12px;border-radius:10px;margin-bottom:20px;}
+        .info-panel p{margin:5px 0;color:#333;}
         .game-area{margin:20px 0;}
-        #tip{font-size:18px;margin:20px 0;color:#333;font-weight:bold;min-height:26px;}
+        #tip{font-size:18px;margin:20px 0;color:#333;font-weight:bold;min-height:26px;transition:0.3s;}
+        .win{color:#27ae60;}
+        .lose{color:#e74c3c;}
         input{padding:10px;width:180px;font-size:16px;border:2px solid #94b8e8;border-radius:8px;outline:none;text-align:center;}
-        .btn-group{margin-top:25px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center;}
-        button{padding:11px 18px;border:none;border-radius:8px;font-size:15px;cursor:pointer;transition:0.2s;}
+        .btn-group{margin-top:25px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+        button{padding:11px 16px;border:none;border-radius:8px;font-size:15px;cursor:pointer;transition:0.2s;}
         #submit{background:#2c5c97;color:white;}
         #reset{background:#e67e22;color:white;}
         #hint{background:#27ae60;color:white;}
         #countBtn{background:#9b59b6;color:white;}
+        #clearLog{background:#888;color:white;}
         button:hover{opacity:0.85;transform:scale(1.03);}
         .record{margin-top:25px;text-align:left;background:#f7faff;padding:15px;border-radius:10px;}
         .record h3{color:#2c5c97;margin-bottom:8px;}
@@ -27,17 +32,27 @@
 <body>
 <div class="container">
     <h1>猜数字小游戏</h1>
+    <div class="info-panel">
+        <p>当前难度：<span id="levelText">普通(1~100)</span>｜剩余次数：<span id="remainText">10</span></p>
+        <p>本局得分：<span id="scoreText">0</span>｜历史最高分：<span id="highScoreText">0</span></p>
+        <div class="btn-group">
+            <button id="easy">简单(1~50)</button>
+            <button id="normal">普通(1~100)</button>
+            <button id="hard">困难(1~200)</button>
+        </div>
+    </div>
 
     <div class="game-area">
-        <p>系统随机生成 1~100 的整数，请输入你的猜测：</p>
-        <input type="number" id="numInput" placeholder="输入数字" min="1" max="100">
-        <div id="tip">游戏即将开始，点击按钮开始挑战！</div>
+        <p>在范围内猜测随机数字，请输入你的数字：</p>
+        <input type="number" id="numInput" placeholder="输入数字">
+        <div id="tip">选择难度，开始游戏！</div>
 
         <div class="btn-group">
             <button id="submit">提交猜测</button>
             <button id="reset">重新开局</button>
             <button id="hint">获取提示</button>
             <button id="countBtn">查看猜测次数</button>
+            <button id="clearLog">清空记录</button>
         </div>
     </div>
 
@@ -50,28 +65,75 @@
 <script>
     let answer = 0;
     let count = 0;
+    let remain = 10;
+    let rangeMin = 1;
+    let rangeMax = 100;
+    let highScore = localStorage.getItem("guessHighScore") || 0;
+
     let logDom = document.getElementById("log");
     let tipDom = document.getElementById("tip");
     let inputDom = document.getElementById("numInput");
+    let levelText = document.getElementById("levelText");
+    let remainText = document.getElementById("remainText");
+    let scoreText = document.getElementById("scoreText");
+    let highScoreText = document.getElementById("highScoreText");
+    highScoreText.innerText = highScore;
 
     function initGame(){
-        answer = Math.floor(Math.random() * 100) + 1;
+        answer = Math.floor(Math.random() * (rangeMax - rangeMin +1)) + rangeMin;
+        if(rangeMax ===50) remain = 8;
+        else if(rangeMax ===100) remain =10;
+        else remain =15;
         count = 0;
-        tipDom.innerText = "新游戏开始！请输入1~100数字";
+        tipDom.innerText = "新游戏开始！请输入数字";
+        tipDom.className = "";
         logDom.innerHTML = "";
         inputDom.value = "";
+        remainText.innerText = remain;
+        scoreText.innerText = 0;
     }
 
+    //难度切换
+    document.getElementById("easy").onclick = function(){
+        rangeMin =1; rangeMax=50;
+        levelText.innerText="简单(1~50)";
+        initGame();
+    }
+    document.getElementById("normal").onclick = function(){
+        rangeMin =1; rangeMax=100;
+        levelText.innerText="普通(1~100)";
+        initGame();
+    }
+    document.getElementById("hard").onclick = function(){
+        rangeMin =1; rangeMax=200;
+        levelText.innerText="困难(1~200)";
+        initGame();
+    }
+
+    //提交猜测
     document.getElementById("submit").onclick = function(){
         let val = parseInt(inputDom.value);
-        if(isNaN(val) || val<1 || val>100){
-            tipDom.innerText = "请输入1到100之间有效数字！";
+        if(isNaN(val) || val < rangeMin || val > rangeMax){
+            tipDom.innerText = `请输入${rangeMin}到${rangeMax}之间有效数字！`;
             return;
         }
         count++;
+        remain--;
+        remainText.innerText = remain;
         let msg = "";
         if(val === answer){
-            msg = `🎉恭喜！猜对啦！答案就是${val}，一共猜了${count}次`;
+            let score = remain * 10;
+            scoreText.innerText = score;
+            msg = `🎉恭喜！猜对啦！答案就是${val}，得分${score}`;
+            tipDom.innerText = msg;
+            tipDom.className = "win";
+            if(score > highScore){
+                highScore = score;
+                localStorage.setItem("guessHighScore", highScore);
+                highScoreText.innerText = highScore;
+            }
+            logDom.innerHTML += `第${count}次：${val} → ${msg}<br/>`;
+            return;
         }else if(val < answer){
             msg = `❌数字偏小，再试试！`;
         }else{
@@ -79,21 +141,27 @@
         }
         tipDom.innerText = msg;
         logDom.innerHTML += `第${count}次：${val} → ${msg}<br/>`;
+
+        if(remain <=0){
+            tipDom.innerText = `💥机会用完！游戏结束，答案是${answer}`;
+            tipDom.className = "lose";
+        }
     }
 
     document.getElementById("reset").onclick = initGame;
 
     document.getElementById("hint").onclick = function(){
-        let low = answer - 5;
-        let high = answer +5;
+        let low = answer - Math.floor((rangeMax-rangeMin)/10);
+        let high = answer + Math.floor((rangeMax-rangeMin)/10);
         tipDom.innerText = `💡提示：答案在 ${low} ~ ${high} 之间`;
     }
 
     document.getElementById("countBtn").onclick = function(){
-        tipDom.innerText = `📊当前已经猜测：${count} 次`;
+        tipDom.innerText = `📊当前已经猜测：${count} 次，剩余${remain}次机会`;
     }
-
-    initGame();
+    document.getElementById("clearLog").onclick = function(){
+        logDom.innerHTML = "";
+    }
 </script>
 </body>
 </html>
